@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06111f">
+<title>Cyber Buddy AR - ผจญภัยพลังมือพิชิตอุปกรณ์คอมพิวเตอร์</title>
+<style>
+:root{
+  --bg:#06111f;--panel:#0c1d30;--panel2:#122b44;--text:#f5fbff;--muted:#a9c1d4;
+  --cyan:#22d3ee;--blue:#60a5fa;--pink:#fb7185;--green:#4ade80;--yellow:#facc15;
+  --violet:#a78bfa;--line:#2c4b67;--danger:#ef4444;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Noto Sans Thai",Tahoma,sans-serif;background:
+radial-gradient(circle at 12% 0%,rgba(34,211,238,.13),transparent 30%),
+radial-gradient(circle at 90% 10%,rgba(167,139,250,.12),transparent 32%),
+linear-gradient(#050b14,#071523 55%,#06111f);color:var(--text)}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible{outline:4px solid #a5f3fc;outline-offset:3px}
+.app{max-width:1120px;margin:auto;padding:10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.brand{font-size:clamp(21px,3vw,34px);font-weight:1000}.brand b{color:var(--cyan)}
+.stats{display:flex;gap:7px;flex-wrap:wrap}
+.pill{background:rgba(12,29,48,.94);border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-weight:900}
+.panel{background:rgba(12,29,48,.97);border:1px solid var(--line);border-radius:24px;padding:clamp(13px,2.4vw,24px);box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.hero{text-align:center;padding:17px 8px}
+.heroIcon{font-size:clamp(78px,14vw,145px);display:inline-block;animation:wobble 1.7s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-8px)}}
+h1{font-size:clamp(29px,5vw,50px);line-height:1.08;margin:.25em 0}
+h2{font-size:clamp(24px,4vw,37px);margin:.25em 0}
+p{font-size:clamp(17px,2.2vw,21px);line-height:1.55}.muted{color:var(--muted)}
+.story{max-width:870px;margin:14px auto;background:#10263e;border:1px solid var(--line);border-radius:18px;padding:15px;text-align:left}
+.actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.btn{border:0;border-radius:15px;min-height:50px;padding:10px 17px;font-weight:1000;color:#06111f;transition:.14s transform,.14s filter}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}.btn:active{transform:translateY(1px)}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--blue))}
+.secondary{background:#e2e8f0}.gold{background:linear-gradient(135deg,#fde68a,var(--yellow))}
+.green{background:linear-gradient(135deg,#86efac,#34d399)}.pink{background:linear-gradient(135deg,#fecdd3,#fb7185)}
+.gestureGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:18px auto;max-width:850px}
+.gestureCard{background:#0b1a2b;border:2px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+.gestureCard .g{font-size:58px}.gestureCard strong{display:block;font-size:19px}.gestureCard small{color:var(--muted)}
+.arFrame{position:relative;max-width:980px;margin:auto;border:2px solid var(--line);border-radius:22px;overflow:hidden;background:#030712;aspect-ratio:4/3}
+#camera{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#020617}
+#overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.scanlines{position:absolute;inset:0;pointer-events:none;opacity:.14;background:repeating-linear-gradient(0deg,transparent 0 4px,rgba(34,211,238,.13) 5px)}
+.corner{position:absolute;width:42px;height:42px;border-color:#67e8f9;opacity:.85;pointer-events:none}
+.c1{left:10px;top:10px;border-left:3px solid;border-top:3px solid}.c2{right:10px;top:10px;border-right:3px solid;border-top:3px solid}
+.c3{left:10px;bottom:10px;border-left:3px solid;border-bottom:3px solid}.c4{right:10px;bottom:10px;border-right:3px solid;border-bottom:3px solid}
+.target{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);width:min(220px,36%);min-width:145px;
+ background:rgba(5,15,28,.84);border:3px solid var(--cyan);border-radius:22px;padding:12px;text-align:center;box-shadow:0 0 35px rgba(34,211,238,.25);
+ animation:floatTarget 2.1s ease-in-out infinite;transition:left .55s ease,top .55s ease,transform .18s ease,opacity .25s}
+@keyframes floatTarget{50%{transform:translate(-50%,-56%)}}
+.target.hit{transform:translate(-50%,-50%) scale(1.32) rotate(6deg);opacity:0}
+.target .device{font-size:clamp(64px,11vw,112px);filter:drop-shadow(0 8px 14px rgba(0,0,0,.3))}
+.target .deviceName{font-size:clamp(18px,2.6vw,27px);font-weight:1000}
+.target .shield{font-size:14px;color:#d7efff;margin-top:4px}
+.arHud{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;align-items:flex-start}
+.hudBox{background:rgba(2,8,23,.78);border:1px solid #476985;border-radius:14px;padding:7px 10px;font-weight:900;backdrop-filter:blur(4px)}
+#gestureStatus{max-width:52%;text-align:right}
+.powerHint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(2,8,23,.84);border:1px solid #4c6f8d;border-radius:999px;padding:8px 13px;font-weight:900;text-align:center;min-width:55%}
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(2,8,23,.94);z-index:8;padding:20px;text-align:center}
+.spinner{width:50px;height:50px;border-radius:50%;border:5px solid #24415c;border-top-color:var(--cyan);animation:spin 1s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:11px}
+.mission{font-weight:900;color:#d8f5ff}
+.progress{height:15px;border-radius:999px;overflow:hidden;background:#06111f;border:1px solid var(--line);margin:11px 0}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--green));transition:width .35s}
+.feedback{margin:10px auto 0;max-width:940px;border-radius:16px;padding:11px 14px;background:#091827;border:1px solid var(--line);min-height:54px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:clamp(17px,2.4vw,23px)}
+.feedback.good{background:#0b372a;border-color:#34d399}.feedback.try{background:#3b2a0b;border-color:#eab308}
+.tutorialStep{max-width:750px;margin:15px auto;padding:18px;border-radius:20px;border:2px solid var(--line);background:#0b1a2b;text-align:center}
+.tutorialStep .big{font-size:90px}.tutorialStep.ok{border-color:#34d399;background:#0b3027}
+.small{font-size:14px;color:var(--muted);line-height:1.45}
+.toast{position:fixed;z-index:50;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);opacity:0;background:#020617;border:1px solid #334155;color:#fff;border-radius:999px;padding:10px 16px;font-weight:900;transition:.2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:45}
+.fx i{position:absolute;top:-30px;font-style:normal;font-size:24px;animation:fall 1.6s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(620deg);opacity:.1}}
+@media(max-width:680px){
+ .app{padding:6px}.panel{border-radius:17px}.gestureGrid{grid-template-columns:1fr}.arFrame{aspect-ratio:3/4}
+ #gestureStatus{max-width:62%;font-size:13px}.powerHint{min-width:86%;font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.credit-footer{
+  max-width:1120px;
+  margin:14px auto 24px;
+  padding:14px 16px;
+  text-align:center;
+  color:#a9c1d4;
+  font-size:14px;
+  line-height:1.6;
+}
+.credit-footer strong{color:#67e8f9}
+.credit-footer .school{opacity:.9}
+
+</style>
+</head>
+<body>
+<div class="app">
+ <header class="top">
+  <div class="brand">🤖 <b>CYBER BUDDY AR</b></div>
+  <div class="stats">
+   <div class="pill">⚡ XP <span id="score">0</span></div>
+   <div class="pill">💎 ชิป <span id="chips">0</span></div>
+   <div class="pill">🔥 Combo <span id="combo">0</span></div>
+  </div>
+ </header>
+ <main class="panel" id="screen"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="fx" id="fx"></div>
+
+<script type="module">
+import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/+esm";
+
+const screen=document.getElementById('screen');
+const scoreEl=document.getElementById('score'),chipsEl=document.getElementById('chips'),comboEl=document.getElementById('combo');
+const toast=document.getElementById('toast'),fx=document.getElementById('fx');
+
+const GESTURES={
+ PINCH:{key:'PINCH',label:'มือจีบ',emoji:'🤏',color:'#22d3ee',group:'Input'},
+ VICTORY:{key:'VICTORY',label:'ชู 2 นิ้ว',emoji:'✌️',color:'#facc15',group:'Output'},
+ ILY:{key:'ILY',label:'I Love You',emoji:'🤟',color:'#fb7185',group:'Internal'}
+};
+
+const MISSIONS=[
+ {icon:'🖱️',name:'เมาส์',group:'Input',gesture:'PINCH',fact:'เมาส์เป็นอุปกรณ์ Input ใช้ควบคุมตัวชี้และส่งคำสั่งเข้าสู่คอมพิวเตอร์'},
+ {icon:'⌨️',name:'คีย์บอร์ด',group:'Input',gesture:'PINCH',fact:'คีย์บอร์ดเป็น Input ใช้ป้อนตัวอักษร ตัวเลข และคำสั่ง'},
+ {icon:'🎤',name:'ไมโครโฟน',group:'Input',gesture:'PINCH',fact:'ไมโครโฟนรับเสียงเข้าสู่คอมพิวเตอร์ จึงเป็น Input'},
+ {icon:'🖥️',name:'จอภาพ',group:'Output',gesture:'VICTORY',fact:'จอภาพเป็น Output ใช้แสดงข้อความ ภาพ และวิดีโอ'},
+ {icon:'🔊',name:'ลำโพง',group:'Output',gesture:'VICTORY',fact:'ลำโพงเป็น Output เพราะส่งเสียงจากคอมพิวเตอร์ออกมา'},
+ {icon:'🖨️',name:'เครื่องพิมพ์',group:'Output',gesture:'VICTORY',fact:'เครื่องพิมพ์เป็น Output เพราะเปลี่ยนข้อมูลดิจิทัลเป็นเอกสารบนกระดาษ'},
+ {icon:'🧠',name:'CPU',group:'Internal',gesture:'ILY',fact:'CPU ทำหน้าที่คำนวณและประมวลผลคำสั่งหลักของระบบ'},
+ {icon:'⚡',name:'RAM',group:'Internal',gesture:'ILY',fact:'RAM เป็นหน่วยความจำชั่วคราวสำหรับข้อมูลของโปรแกรมที่กำลังทำงาน'},
+ {icon:'💾',name:'SSD',group:'Internal',gesture:'ILY',fact:'SSD ใช้จัดเก็บข้อมูลระยะยาว แม้ปิดเครื่องข้อมูลยังคงอยู่'}
+];
+
+const state={
+ score:0,chips:0,combo:0,index:0,stream:null,recognizer:null,running:false,lastVideoTime:-1,
+ lastGesture:'NONE',gestureSince:0,lastFireAt:0,latestHand:null,currentPower:null,
+ tutorialMode:false,tutorialIndex:0,tutorialTargets:['PINCH','VICTORY','ILY'],cameraFacing:'user',
+ audioOn:true,targetMoveTimer:null,recognitionLoop:0
+};
+
+function updateStats(){scoreEl.textContent=state.score;chipsEl.textContent=state.chips;comboEl.textContent=state.combo}
+function toastMsg(t){toast.textContent=t;toast.classList.add('show');clearTimeout(toastMsg.t);toastMsg.t=setTimeout(()=>toast.classList.remove('show'),1500)}
+function confetti(){
+ const a=['⚡','✨','💎','⭐','💻','🔧'];
+ for(let i=0;i<24;i++){const n=document.createElement('i');n.textContent=a[Math.floor(Math.random()*a.length)];n.style.left=Math.random()*100+'%';n.style.animationDelay=Math.random()*.35+'s';fx.appendChild(n);setTimeout(()=>n.remove(),1900)}
+}
+let audioCtx;
+function sound(type='fire'){
+ if(!state.audioOn)return;
+ try{
+  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+  const seq=type==='good'?[520,780,1040]:type==='bad'?[190,150]:type==='charge'?[300,420]:[700,950];
+  seq.forEach((f,i)=>{
+   const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);
+   o.type=type==='bad'?'square':'sine';o.frequency.value=f;const t=audioCtx.currentTime+i*.055;
+   g.gain.setValueAtTime(.055,t);g.gain.exponentialRampToValueAtTime(.001,t+.14);o.start(t);o.stop(t+.15);
+  });
+ }catch(e){}
+}
+function home(){
+ stopCamera();
+ screen.innerHTML=`
+ <section class="hero">
+  <div class="heroIcon">🤖📷✨</div>
+  <h1>Cyber Buddy AR</h1>
+  <p class="muted">ใช้มือจริงปล่อยพลังผ่านกล้อง เพื่อช่วย Cyber Buddy กู้คืนอุปกรณ์คอมพิวเตอร์!</p>
+  <div class="gestureGrid">
+   <div class="gestureCard"><div class="g">🤏</div><strong>มือจีบ / หนีบนิ้ว</strong><small>พลังฟ้า = อุปกรณ์ Input</small></div>
+   <div class="gestureCard"><div class="g">✌️</div><strong>ชู 2 นิ้ว</strong><small>พลังทอง = อุปกรณ์ Output</small></div>
+   <div class="gestureCard"><div class="g">🤟</div><strong>I Love You</strong><small>พลังชมพู = อุปกรณ์ภายใน</small></div>
+  </div>
+  <div class="story"><strong>วิธีเล่น:</strong> กล้องจะเห็นมือของผู้เล่น เมื่ออุปกรณ์ลอยขึ้นมา ให้คิดว่าอุปกรณ์นั้นเป็น Input, Output หรืออุปกรณ์ภายใน แล้วทำท่ามือให้ตรงกับพลังเพื่อยิงใส่อุปกรณ์</div>
+  <div class="actions">
+   <button class="btn primary" id="tutorial">🖐️ ฝึกท่ามือก่อน</button>
+   <button class="btn green" id="play">🚀 เข้า AR Adventure</button>
+  </div>
+  <p class="small">ต้องอนุญาตการใช้กล้อง • ใช้งานผ่าน HTTPS หรือ localhost • ต้องเชื่อมอินเทอร์เน็ตเพื่อโหลดโมเดลตรวจจับมือ</p>
+ </section>`;
+ document.getElementById('tutorial').onclick=()=>startAR(true);
+ document.getElementById('play').onclick=()=>startAR(false);
+}
+
+async function initRecognizer(){
+ if(state.recognizer)return;
+ const vision=await FilesetResolver.forVisionTasks(
+  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/wasm"
+ );
+ state.recognizer=await GestureRecognizer.createFromOptions(vision,{
+  baseOptions:{
+   modelAssetPath:"https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+   delegate:"CPU"
+  },
+  runningMode:"VIDEO",
+  numHands:1,
+  minHandDetectionConfidence:.5,
+  minHandPresenceConfidence:.5,
+  minTrackingConfidence:.5
+ });
+}
+async function getCamera(){
+ if(!navigator.mediaDevices?.getUserMedia)throw new Error('เบราว์เซอร์นี้ไม่รองรับกล้องเว็บ หรือหน้าเว็บไม่ได้เปิดผ่าน HTTPS/localhost');
+ if(state.stream)state.stream.getTracks().forEach(t=>t.stop());
+ state.stream=await navigator.mediaDevices.getUserMedia({
+  video:{facingMode:state.cameraFacing,width:{ideal:1280},height:{ideal:960}},
+  audio:false
+ });
+}
+function stopCamera(){
+ state.running=false;
+ cancelAnimationFrame(state.recognitionLoop);
+ clearInterval(state.targetMoveTimer);
+ if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null}
+}
+async function startAR(tutorial=false){
+ state.tutorialMode=tutorial;state.tutorialIndex=0;state.index=0;state.score=0;state.chips=0;state.combo=0;state.lastGesture='NONE';state.latestHand=null;updateStats();
+ screen.innerHTML=`
+ <div class="arFrame">
+  <video id="camera" autoplay playsinline muted></video>
+  <canvas id="overlay"></canvas>
+  <div class="scanlines"></div><div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+  <div class="loading" id="loading"><div class="spinner"></div><h2>กำลังเปิดพลัง AR...</h2><p class="muted" id="loadText">กรุณาอนุญาตการใช้กล้อง</p></div>
+  <div class="arHud"><div class="hudBox" id="missionLabel">${tutorial?'โหมดฝึกท่ามือ':'ภารกิจ AR'}</div><div class="hudBox" id="gestureStatus">🖐️ กำลังค้นหามือ...</div></div>
+  ${tutorial?'':`<div class="target" id="target"></div>`}
+  <div class="powerHint" id="powerHint">${tutorial?'ทำท่าตามที่แสดงด้านล่าง':'คิดว่าอุปกรณ์เป็นกลุ่มใด แล้วใช้พลังที่ถูกต้อง'}</div>
+ </div>
+ <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+ <div class="feedback" id="feedback">${tutorial?'เริ่มจากมือจีบ 🤏':'พร้อมออกผจญภัย!'}</div>
+ <div id="tutorialArea"></div>
+ <div class="controls">
+  <div class="mission" id="missionText">${tutorial?'ฝึกให้ระบบจำท่าของคุณทั้ง 3 ท่า':'ภารกิจ 1/'+MISSIONS.length}</div>
+  <div class="actions" style="margin:0">
+   <button class="btn gold" id="audioBtn">🔊 เสียง: เปิด</button>
+   <button class="btn secondary" id="flipBtn">🔄 สลับกล้อง</button>
+   <button class="btn secondary" id="exitBtn">🏠 ออก</button>
+  </div>
+ </div>`;
+ document.getElementById('exitBtn').onclick=home;
+ document.getElementById('audioBtn').onclick=()=>{
+  state.audioOn=!state.audioOn;document.getElementById('audioBtn').textContent=state.audioOn?'🔊 เสียง: เปิด':'🔇 เสียง: ปิด';
+ };
+ document.getElementById('flipBtn').onclick=async()=>{
+  state.cameraFacing=state.cameraFacing==='user'?'environment':'user';
+  try{await getCamera();document.getElementById('camera').srcObject=state.stream}catch(e){toastMsg('สลับกล้องไม่สำเร็จ')}
+ };
+ if(tutorial)renderTutorial();
+ else renderMission();
+ try{
+  document.getElementById('loadText').textContent='กำลังโหลดระบบตรวจจับท่ามือ...';
+  await Promise.all([initRecognizer(),getCamera()]);
+  const video=document.getElementById('camera');video.srcObject=state.stream;await video.play();
+  document.getElementById('loading').style.display='none';
+  resizeCanvas();window.addEventListener('resize',resizeCanvas,{passive:true});
+  state.running=true;predictLoop();
+  if(!tutorial)startTargetMovement();
+ }catch(e){
+  const loading=document.getElementById('loading');
+  loading.innerHTML=`<h2>⚠️ เปิด AR ไม่สำเร็จ</h2><p>${String(e.message||e)}</p><p class="small">โปรดเปิดผ่าน HTTPS หรือ localhost และอนุญาตกล้องในเบราว์เซอร์</p><button class="btn secondary" id="failBack">กลับหน้าแรก</button>`;
+  document.getElementById('failBack').onclick=home;
+ }
+}
+function resizeCanvas(){
+ const video=document.getElementById('camera'),canvas=document.getElementById('overlay');
+ if(!video||!canvas)return;
+ const rect=video.getBoundingClientRect();canvas.width=Math.max(1,Math.round(rect.width*devicePixelRatio));canvas.height=Math.max(1,Math.round(rect.height*devicePixelRatio));
+}
+function renderTutorial(){
+ const key=state.tutorialTargets[state.tutorialIndex],g=GESTURES[key];
+ const area=document.getElementById('tutorialArea');
+ if(!g){
+  area.innerHTML=`<div class="tutorialStep ok"><div class="big">🏆</div><h2>พร้อมแล้ว!</h2><p>ระบบตรวจพบท่าทั้ง 3 แบบแล้ว</p><button class="btn green" id="startGame">เริ่ม AR Adventure</button></div>`;
+  document.getElementById('feedback').className='feedback good';document.getElementById('feedback').textContent='เยี่ยมมาก! ท่ามือพร้อมใช้งาน';
+  document.getElementById('progressBar').style.width='100%';
+  document.getElementById('startGame').onclick=()=>{stopCamera();startAR(false)};
+  return;
+ }
+ area.innerHTML=`<div class="tutorialStep"><div class="big">${g.emoji}</div><h2>ทำท่า “${g.label}”</h2><p>ค้างท่าไว้ประมาณครึ่งวินาที</p></div>`;
+ document.getElementById('missionText').textContent=`ฝึกท่า ${state.tutorialIndex+1}/3`;
+ document.getElementById('progressBar').style.width=(state.tutorialIndex/3*100)+'%';
+}
+function renderMission(){
+ const m=MISSIONS[state.index];if(!m){finishGame();return}
+ const g=GESTURES[m.gesture],target=document.getElementById('target');
+ target.classList.remove('hit');
+ target.innerHTML=`<div class="device">${m.icon}</div><div class="deviceName">${m.name}</div><div class="shield">🛡️ วิเคราะห์ประเภท แล้วใช้พลังให้ถูก</div>`;
+ document.getElementById('missionText').textContent=`ภารกิจ ${state.index+1}/${MISSIONS.length} • ${m.name}`;
+ document.getElementById('missionLabel').textContent=`🎯 เป้าหมาย: ${m.name}`;
+ document.getElementById('progressBar').style.width=(state.index/MISSIONS.length*100)+'%';
+ document.getElementById('feedback').className='feedback';document.getElementById('feedback').textContent='อุปกรณ์นี้เป็น Input, Output หรืออุปกรณ์ภายใน?';
+ moveTarget();
+}
+function startTargetMovement(){
+ clearInterval(state.targetMoveTimer);
+ state.targetMoveTimer=setInterval(()=>{if(!state.tutorialMode)moveTarget()},2600);
+}
+function moveTarget(){
+ const t=document.getElementById('target');if(!t)return;
+ const x=22+Math.random()*56,y=28+Math.random()*42;t.style.left=x+'%';t.style.top=y+'%';
+}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function classify(result){
+ const lm=result?.landmarks?.[0];let gesture='NONE',score=0;
+ const top=result?.gestures?.[0]?.[0];
+ if(top){score=top.score||0;if(top.categoryName==='Victory')gesture='VICTORY';if(top.categoryName==='ILoveYou')gesture='ILY'}
+ if(lm&&distance(lm[4],lm[8])<0.055){gesture='PINCH';score=Math.max(score,.95)}
+ return {gesture,score,lm};
+}
+function predictLoop(){
+ if(!state.running)return;
+ const video=document.getElementById('camera');
+ if(video&&video.readyState>=2&&video.currentTime!==state.lastVideoTime){
+  state.lastVideoTime=video.currentTime;
+  try{
+   const result=state.recognizer.recognizeForVideo(video,performance.now());
+   const c=classify(result);state.latestHand=c.lm;handleDetectedGesture(c.gesture,c.score);drawOverlay(c.lm,c.gesture);
+  }catch(e){}
+ }
+ state.recognitionLoop=requestAnimationFrame(predictLoop);
+}
+function handleDetectedGesture(gesture,score){
+ const status=document.getElementById('gestureStatus');if(!status)return;
+ const now=performance.now();
+ if(gesture==='NONE'||score<.48){
+  status.textContent='🖐️ ยกมือให้อยู่ในกรอบกล้อง';state.lastGesture='NONE';state.gestureSince=now;return;
+ }
+ const g=GESTURES[gesture];status.textContent=`${g.emoji} พบ: ${g.label}`;
+ if(state.lastGesture!==gesture){state.lastGesture=gesture;state.gestureSince=now;sound('charge');return}
+ const held=now-state.gestureSince;
+ if(held>430&&now-state.lastFireAt>1150){
+  state.lastFireAt=now;state.gestureSince=now;firePower(gesture);
+ }
+}
+function firePower(gesture){
+ const g=GESTURES[gesture];state.currentPower={gesture,color:g.color,start:performance.now(),hand:state.latestHand};
+ sound('fire');
+ if(state.tutorialMode){
+  const need=state.tutorialTargets[state.tutorialIndex];
+  if(gesture===need){
+   document.getElementById('feedback').className='feedback good';document.getElementById('feedback').textContent=`✅ ระบบจำ “${GESTURES[need].label}” ได้แล้ว!`;
+   sound('good');confetti();state.tutorialIndex++;setTimeout(renderTutorial,650);
+  }else{
+   document.getElementById('feedback').className='feedback try';document.getElementById('feedback').textContent=`ลองทำ ${GESTURES[need].emoji} ${GESTURES[need].label} ค้างไว้อีกนิด`;
+  }
+  return;
+ }
+ const m=MISSIONS[state.index];
+ if(gesture===m.gesture){
+  state.score+=100+state.combo*10;state.chips++;state.combo++;updateStats();sound('good');confetti();
+  const fb=document.getElementById('feedback');fb.className='feedback good';fb.innerHTML=`⚡ สำเร็จ! <strong>${m.name}</strong> — ${m.fact}`;
+  const target=document.getElementById('target');target?.classList.add('hit');
+  setTimeout(()=>{state.index++;renderMission()},1450);
+ }else{
+  state.combo=0;updateStats();sound('bad');
+  const fb=document.getElementById('feedback');fb.className='feedback try';
+  fb.textContent=`💛 พลังยังไม่ตรง ลองคิดจากหน้าที่ของ “${m.name}” แล้วเลือกท่าใหม่`;
+ }
+}
+function drawOverlay(lm,gesture){
+ const canvas=document.getElementById('overlay');if(!canvas)return;
+ const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+ const sx=x=>(1-x)*w,sy=y=>y*h;
+ if(lm){
+  const pairs=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+  ctx.lineWidth=Math.max(2,3*devicePixelRatio);ctx.strokeStyle='rgba(103,232,249,.75)';
+  ctx.beginPath();pairs.forEach(([a,b])=>{ctx.moveTo(sx(lm[a].x),sy(lm[a].y));ctx.lineTo(sx(lm[b].x),sy(lm[b].y))});ctx.stroke();
+  lm.forEach((p,i)=>{ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),i===4||i===8?6*devicePixelRatio:3.2*devicePixelRatio,0,Math.PI*2);ctx.fillStyle=i===4||i===8?'#fde047':'#67e8f9';ctx.fill()});
+ }
+ if(state.currentPower&&performance.now()-state.currentPower.start<520){
+  const p=state.currentPower,hand=p.hand;
+  let x1=w/2,y1=h*.65;
+  if(hand){x1=sx(hand[8].x);y1=sy(hand[8].y)}
+  let x2=w/2,y2=h*.42;
+  const target=document.getElementById('target');
+  if(target){
+   const cr=canvas.getBoundingClientRect(),tr=target.getBoundingClientRect();
+   x2=(tr.left+tr.width/2-cr.left)*devicePixelRatio;y2=(tr.top+tr.height/2-cr.top)*devicePixelRatio;
+  }
+  const grad=ctx.createLinearGradient(x1,y1,x2,y2);grad.addColorStop(0,'#fff');grad.addColorStop(.25,p.color);grad.addColorStop(1,'rgba(255,255,255,.2)');
+  ctx.strokeStyle=grad;ctx.lineWidth=12*devicePixelRatio;ctx.shadowBlur=25*devicePixelRatio;ctx.shadowColor=p.color;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.quadraticCurveTo((x1+x2)/2+Math.sin(performance.now()/30)*25*devicePixelRatio,(y1+y2)/2,x2,y2);ctx.stroke();ctx.shadowBlur=0;
+  for(let i=0;i<12;i++){const t=i/11,x=x1+(x2-x1)*t+(Math.random()-.5)*18*devicePixelRatio,y=y1+(y2-y1)*t+(Math.random()-.5)*18*devicePixelRatio;ctx.beginPath();ctx.arc(x,y,(2+Math.random()*3)*devicePixelRatio,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill()}
+ }
+}
+function finishGame(){
+ stopCamera();document.getElementById('progressBar')?.remove();
+ screen.innerHTML=`
+ <section class="hero">
+  <div class="heroIcon">🤖🏆✨</div><h1>AR Mission Complete!</h1>
+  <p>คุณกู้คืนอุปกรณ์คอมพิวเตอร์ครบทั้ง ${MISSIONS.length} ชิ้นแล้ว</p>
+  <div class="story" style="text-align:center">
+   <div style="font-size:30px;font-weight:1000">👑 CYBER AR HERO 👑</div>
+   <p>คะแนนรวม <strong>${state.score}</strong> XP • Core Chip <strong>${state.chips}</strong> ชิ้น</p>
+   <p class="small">ทบทวน: 🤏 Input • ✌️ Output • 🤟 อุปกรณ์ภายใน</p>
+  </div>
+  <div class="actions"><button class="btn primary" id="again">🔄 เล่นอีกครั้ง</button><button class="btn secondary" id="home">🏠 หน้าแรก</button></div>
+ </section>`;
+ document.getElementById('again').onclick=()=>startAR(false);document.getElementById('home').onclick=home;confetti();
+}
+updateStats();home();
+</script>
+
+<footer class="credit-footer">
+  <div>© Cyber Buddy AR • <strong>พัฒนาโดย ครูนัท พัชรากร</strong></div>
+  <div class="school">สื่อการเรียนรู้วิชาคอมพิวเตอร์สำหรับนักเรียนออทิสติก</div>
+</footer>
+
+</body>
+</html>
